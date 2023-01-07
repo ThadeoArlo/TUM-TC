@@ -59,7 +59,7 @@ async function getResponse(history, msg, res) {
   });
   const openai = new OpenAIApi(configuration);
 
-  history = history + '\nHuman: ' + msg + '\n';
+  history = history + '\nHuman: ' + msg;
 
   const prompt = staticPrefix + '\n' + history;
   console.log("sending to openai: " + prompt);
@@ -67,7 +67,7 @@ async function getResponse(history, msg, res) {
   try {
     const response = await openai.createCompletion({
       model: "text-davinci-003",
-      prompt: prompt,
+      prompt: prompt + "\n",
       temperature: 0.9,
       max_tokens: 500,
       top_p: 1,
@@ -77,7 +77,7 @@ async function getResponse(history, msg, res) {
     });
     const stringResponse = JSON.stringify(response.data);
     console.log("got from openai: " + stringResponse);
-    res.status(200).end(response.data.choices[0].text);
+    res.status(200).end(history + response.data.choices[0].text);
   } catch(error) {
     console.error(error.response.status, error.response.data);
     res.status(error.response.status).json(error.response.data);
